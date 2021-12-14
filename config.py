@@ -13,14 +13,14 @@ class Config:
     def __init__(self, use_crf=True):
         self.seed_every(seed=42)
         self.use_crf = use_crf
-        self.model_path = 'bert_base_chinese'
+        self.model_path = 'bert-base-chinese'
         self.train_file = 'data/train.txt'
         self.test_file = 'data/test.txt'
         self.slot_label_file = 'data/slot_label.txt'
         self.intent_label_file = 'data/intent_label.txt'
 
         self.lr = 8e-6
-        self.barch_size = 32
+        self.batch_size = 32
         self.batch_split = 2  # ?
         self.eval_step = 40
 

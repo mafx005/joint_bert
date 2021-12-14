@@ -25,7 +25,7 @@ class Model(nn.Module):
 
 
     def forward(self, input_ids, attention_mask, token_type_ids=None):
-        out = self.bert(input_id=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        out = self.bert(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         seq_encoding, pool_out = out[0], out[1]
         seq_encoding  = self.drop(seq_encoding)
         pool_out = self.drop(pool_out)

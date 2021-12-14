@@ -24,9 +24,9 @@ class Trainer:
         self.criterion = nn.CrossEntropyLoss(ignore_index=self.config.pad_idx, reduction='none').to(device)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.lr, weight_decay=0.01)
 
-        self.train_dataloader = DataLoader(train_dataset, batch_size=self.config.bs, pin_memory=True,
+        self.train_dataloader = DataLoader(train_dataset, batch_size=self.config.batch_size, pin_memory=True,
                                            shuffle=True, collate_fn=PadBatchData(self.config))
-        self.valid_dataloader = DataLoader(valid_dataset, batch_size=self.config.bs, pin_memory=True,
+        self.valid_dataloader = DataLoader(valid_dataset, batch_size=self.config.batch_size, pin_memory=True,
                                            shuffle=True, collate_fn=PadBatchData(self.config))
 
         self.train_writer = SummaryWriter('train')
@@ -71,7 +71,7 @@ class Trainer:
 
             batch_intent_acc = (torch.argmax(intent_logits, dim=-1) == intent_labels).float().mean()
             batch_slot_acc = (torch.argmax(slot_logits, dim=-1) == slot_labels)
-            batch_slot_acc = torch.sum(batch_slot_acc * slot_mask) / torch.sum(slot_mask)
+            batch_slot_acc = torch.sum(batch_slot_acc.float() * slot_mask) / torch.sum(slot_mask)
 
             # 求sequence_acc
             match = (torch.argmax(slot_logits, dim=-1) == slot_labels).float()
@@ -113,8 +113,8 @@ class Trainer:
                                   'slot_acc': slot_acc, 'seq_acc': seq_slot_acc})
                 intent_loss, slot_loss, intent_acc, slot_acc, seq_slot_acc, step_count = 0, 0, 0, 0, 0, 0
 
-                if epoch % 1 == 0:
-                    self.test(epoch, epoch)
+        if epoch % 1 == 0:
+            self.test(epoch, epoch)
 
     def test(self, epoch, step):
         self.model.eval()
@@ -137,7 +137,7 @@ class Trainer:
 
                 batch_intent_loss = self.criterion(intent_logits, intent_labels)
                 batch_slot_loss = self.criterion(slot_logits.view(-1, slot_logits.shape[-1]), slot_labels.view(-1))
-                slot_mask = 1 - slot_labels.eq(self.config.tokz.pad_token_id).float()
+                slot_mask = 1 - slot_labels.eq(self.config.tokenizer.pad_token_id).float()
                 batch_slot_loss = (batch_slot_loss * slot_mask.view(-1)).view(text.shape[0], -1).sum(
                     dim=-1) / slot_mask.sum(dim=-1)
 
@@ -146,7 +146,7 @@ class Trainer:
 
                 batch_intent_acc = (torch.argmax(intent_logits, dim=-1) == intent_labels).sum()
                 batch_slot_acc = (torch.argmax(slot_logits, dim=-1) == slot_labels)
-                batch_slot_acc = torch.sum(batch_slot_acc * slot_mask, dim=-1) / torch.sum(slot_mask, dim=-1)
+                batch_slot_acc = torch.sum(batch_slot_acc.float() * slot_mask, dim=-1) / torch.sum(slot_mask, dim=-1)
                 # 求sequence_acc
                 match = (torch.argmax(slot_logits, dim=-1) == slot_labels).float()
                 slot_num = torch.sum(slot_mask, dim=-1)

@@ -24,7 +24,7 @@ class MyDataset(Dataset):
                 slot = [self.config.slot_vocab[i] for i in slot.split()]
 
                 dataset.append([
-                    [self.config.tokenizer.cls_token_id] + text + [self.config.tokz.sep_token_id],
+                    [self.config.tokenizer.cls_token_id] + text + [self.config.tokenizer.sep_token_id],
                     intent,
                     [self.config.tokenizer.pad_token_id] + slot + [self.config.tokenizer.pad_token_id],
                     self.config.tokenizer.create_token_type_ids_from_sequences(token_ids_0=text)
