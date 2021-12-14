@@ -21,7 +21,7 @@ class Config:
 
         self.lr = 8e-6
         self.barch_size = 32
-        self.batch_split = 2 # ?
+        self.batch_split = 2  # ?
         self.eval_step = 40
 
         self.intent_lable_num = 47
@@ -30,20 +30,19 @@ class Config:
         self.pad_idx = 0
         self.max_len = 90
 
-
         self.slot_vocab = self.build_vocab(self.slot_label_file)
         self.intent_vocab = self.build_vocab(self.intent_label_file)
 
-        self.id2slot = {v:k for k,v in self.slot_vocab.items()}
-        self.id2intent = {v:k for k,v in self.intent_vocab.items()}
+        self.id2slot = {v: k for k, v in self.slot_vocab.items()}
+        self.id2intent = {v: k for k, v in self.intent_vocab.items()}
 
         self.tokenizer = BertTokenizer.from_pretrained(self.model_path)
         self.bert = BertModel.from_pretrained(self.model_path)
 
     def build_vocab(self, file_name):
-        with open(file_name, 'r', encoding='utf8')as f:
+        with open(file_name, 'r', encoding='utf8') as f:
             lines = f.readlines()
-            vocab = {word.strip():idx for idx, word in enumerate(lines)}
+            vocab = {word.strip(): idx for idx, word in enumerate(lines)}
         return vocab
 
     def seed_every(self, seed=42):
